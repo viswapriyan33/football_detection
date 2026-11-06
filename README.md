@@ -1,4 +1,3 @@
-﻿# football_detection
 # ⚽ AI Football Vision & Analytics Engine
 
 [![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue?logo=python&logoColor=white)](https://www.python.org/)
@@ -7,14 +6,14 @@
 [![OpenCV](https://img.shields.io/badge/OpenCV-Computer%20Vision-5C3EE8?logo=opencv&logoColor=white)](https://opencv.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-An end-to-end computer vision and sports analytics pipeline that transforms raw broadcast match footage into live TV-style tactical telemetry. Powered by a custom-trained **YOLO architecture (97.6% mAP@50)**, **unsupervised K-Means kit clustering**, **optical flow camera motion compensation**, and **real-time possession tracking**.
+An end-to-end computer vision and sports analytics pipeline that transforms raw broadcast match footage into live TV-style tactical telemetry. Powered by a custom-trained **YOLO architecture (97.6% mAP@50)**, **K-Means kit clustering**, **optical flow camera motion compensation**, and **real-time possession tracking**.
 
 ---
 
 ## 🌟 Key Features
 
 * **Custom-Trained YOLO Architecture:** Fine-tuned over 80 epochs for multi-class detection (Ball, Players, Goalkeepers, Referees).
-* **Unsupervised Team Kit Clustering:** Dynamically extracts jersey fabric colors via upper-torso cropping and green pitch HSV masking, separating opposing teams with 2-cluster **K-Means** and **Exponential Moving Average (EMA)** temporal smoothing.
+* **Unsupervised Team Kit Clustering:** Dynamically extracts jersey fabric colors via torso cropping and green pitch HSV masking, separating opposing teams with 2-cluster **K-Means** and **Exponential Moving Average (EMA)** temporal smoothing.
 * **Camera Motion Compensation (Affine RANSAC):** Cancels out broadcast camera pans, tilts, and zooms using background **Lucas-Kanade Optical Flow** to accurately measure true physical player speeds (km/h).
 * **Live Ball Possession Telemetry:** Employs geometric point-to-AABB clamping distance to track ball-to-shoe proximity in real time, rendering a dynamic split-bar television graphic.
 * **Persistent Multi-Object Tracking (IoU):** Tracks individual player trajectories across consecutive frames with occlusion tolerance.
@@ -51,9 +50,7 @@ flowchart TD
 
 ---
 
-## 📊 Model Performance & Metrics
-
-Trained on high-resolution annotated match footage across 80 epochs:
+## 📊 Model Performance
 
 | Metric | Score | Details |
 | :--- | :--- | :--- |
@@ -86,13 +83,12 @@ Trained on high-resolution annotated match footage across 80 epochs:
 ## 🚀 Getting Started
 
 ### 1. Prerequisites
-* Python 3.10, 3.11, or 3.12
-* Windows, macOS, or Linux
+Ensure you have Python 3.10 or higher installed.
 
 ### 2. Clone the Repository
 ```bash
-git clone https://github.com/your-username/football-ai-tracking.git
-cd football-ai-tracking
+git clone https://github.com/viswapriyan33/football_detection.git
+cd football_detection
 ```
 
 ### 3. Create & Activate Virtual Environment
@@ -116,22 +112,22 @@ pip install -r requirements.txt
 
 ## 🎮 How to Run
 
-### 1. Process Video Footage with AI Tracking:
-Run inference on match footage:
+### Run the AI Pipeline on Match Footage:
+Process match footage with live tracking:
 ```bash
 python index.py --source media/match_derby.mp4 --stream
 ```
 
-#### Optional CLI Arguments:
-* `--source`: Path to input video, image, or webcam (e.g. `media/match_red_white.mp4`).
-* `--imgsz`: Inference resolution (default `640` for speed, `1024` for max precision).
-* `--vid_stride`: Frame step (e.g. `2` for real-time broadcast tempo).
+#### Optional CLI Flags:
+* `--source`: Path to input video, image, or webcam (e.g., `media/match_red_white.mp4`).
+* `--imgsz`: Inference resolution (default `640` for speed, `1024` for max accuracy).
+* `--vid_stride`: Frame step (e.g., `2` for real-time broadcast tempo).
 * `--conf`: Confidence threshold (default `0.25`).
 
 ---
 
-### 2. Run the Smooth Real-Time Player (Zero-Lag):
-To watch or screen-record pre-rendered match footage at **smooth, real-match 25–30 FPS**:
+### Run the Smooth Real-Time Player:
+To watch or screen-record pre-rendered match footage at **100% smooth, natural 25–30 FPS**:
 
 ```bash
 # Play Match 2 (Navy Blue vs. White Kits)
@@ -141,39 +137,19 @@ python play.py 2
 python play.py 1
 ```
 
-* **Keyboard Shortcuts:**
+* **Keyboard Controls:**
   * `f` &rarr; Toggle Fullscreen
   * `Spacebar` &rarr; Pause / Resume
   * `q` &rarr; Exit player
 
 ---
 
-## 🔬 Mathematical & Algorithmic Highlights
+## 🛠️ Tech Stack & Mathematical Foundations
 
-### 1. Camera Motion Compensation (Affine RANSAC)
-Broadcast cameras continuously pan, tilt, and zoom. To measure true player sprint speeds rather than camera movement:
-1. All detected players are masked out to isolate stationary grass features.
-2. Lucas-Kanade Optical Flow tracks background pitch features between frame $t-1$ and $t$.
-3. An affine matrix $M$ is estimated using RANSAC outlier rejection, accumulating camera translation into a global coordinate matrix:
-   $$\text{World Coordinates} = M_{\text{cum}} \times [x, y, 1]^T$$
-
-### 2. Dynamic Meters-Per-Pixel Perspective Scaling
-In perspective projection, players further away appear smaller. Rather than requiring complex pitch camera calibration, the engine calculates a dynamic scale based on average human height ($1.80\text{m}$):
-$$\text{Scale (meters/pixel)} = \frac{1.80\text{ meters}}{\text{Bounding Box Height (pixels)}}$$
-
-### 3. Ball-to-Shoe Clamping Distance
-Standard center-to-center distances fail because players are tall ($150\text{px}$) and the ball is on the ground near their feet. Clamping the ball coordinates $(bx, by)$ to the player's bounding box edge accurately reflects true proximity:
-$$\Delta x = bx - \text{clamp}(bx, x_1, x_2)$$
-$$\Delta y = by - \text{clamp}(by, y_1, y_2)$$
-$$\text{Distance} = \sqrt{\Delta x^2 + \Delta y^2}$$
-
----
-
-## 🛠️ Tech Stack
-
-* **Object Detection:** [Ultralytics YOLO](https://github.com/ultralytics/ultralytics) + [PyTorch](https://pytorch.org/)
+* **Deep Learning:** [Ultralytics YOLO](https://github.com/ultralytics/ultralytics) + [PyTorch](https://pytorch.org/)
 * **Computer Vision:** [OpenCV](https://opencv.org/) (Lucas-Kanade Optical Flow, Affine Transformations, HSV color segmentation)
-* **Clustering & Tracking:** NumPy, SciPy (K-Means Clustering, IoU greedy matching, Exponential Moving Average)
+* **Clustering & Tracking:** Scikit-Learn / SciPy / NumPy (K-Means, IoU greedy matching, Exponential Moving Average)
+* **Camera Stabilization:** Point-to-AABB distance geometry & RANSAC transformation matrices
 
 ---
 

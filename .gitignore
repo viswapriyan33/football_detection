@@ -18,3 +18,7 @@ output/
 # OS files
 .DS_Store
 Thumbs.db
+
+
+# Ignore large downloaded match video samples (keep repo lightweight)
+media/*.mp4
